@@ -79,7 +79,7 @@ public class WheelDriveControl : MonoBehaviour
         float torque = maxTorque * _acceleration;
 
         float handBrake = _brake > 0 ? brakeTorque : 0;
-
+        // Steer front wheels only
         foreach (var wheel in wheels)
         {
             if (wheel.transform.localPosition.z > 0)
@@ -98,14 +98,6 @@ public class WheelDriveControl : MonoBehaviour
                     wheel.motorTorque = torque;
                 }
             }
-            // Steer front wheels only
-            // if (wheel.transform.localPosition.z > 0) wheel.steerAngle = angle;
-            //
-            // if (wheel.transform.localPosition.z < 0) wheel.brakeTorque = handBrake;
-            //
-            // if (wheel.transform.localPosition.z < 0 && driveType != DriveType.FrontWheelDrive) wheel.motorTorque = torque;
-            //
-            // if (wheel.transform.localPosition.z >= 0 && driveType != DriveType.RearWheelDrive) wheel.motorTorque = torque;
             
         }
 

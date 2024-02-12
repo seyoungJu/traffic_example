@@ -118,12 +118,10 @@ namespace TrafficSimulation{
                     shapeTransform.rotation = q;
                 }
             }
-
-
+            
             //Apply speed
             float s = GetSpeedUnit(rb.velocity.magnitude);
             if(s > maxSpeed) rb.velocity = GetSpeedMS(maxSpeed) * rb.velocity.normalized;
-
             
             //Apply downforce
             rb.AddForce(-transform.up * downForce * rb.velocity.magnitude);
