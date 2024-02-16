@@ -1,18 +1,37 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEditor;
 
-public class VehicleControlEditor : MonoBehaviour
+public class VehicleControlEditor : Editor
 {
-    // Start is called before the first frame update
-    void Start()
+    [MenuItem("Component/Traffic Simulation/Setup Vehicle")]
+    private static void SetupVehicle()
     {
-        
-    }
+        EditorHelper.SetUndoGroup("Setup Vehicle");
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        GameObject selected = Selection.activeGameObject;
+
+        GameObject anchor = EditorHelper.CreateGameObject("RayCast Anchor", selected.transform);
+
+        VehicleControl vehicleControl = EditorHelper.AddComponent<VehicleControl>(selected);
+        WheelDriveControl wheelDriveControl = EditorHelper.AddComponent<WheelDriveControl>(selected);
+
+        TrafficHeadQuater headQuater = FindObjectOfType<TrafficHeadQuater>();
+
+        anchor.transform.localPosition = Vector3.zero;
+        anchor.transform.localRotation = quaternion.identity;
+        vehicleControl.raycastAnchor = anchor.transform;
+
+        if (headQuater != null)
+        {
+            vehicleControl.trafficHeadQuater = headQuater;
+        }
+
+        EditorHelper.CreateLayer(TrafficIntersection.VehicleTagLayer);
+
+        selected.tag = TrafficIntersection.VehicleTagLayer;
+        EditorHelper.SetLayer(selected, LayerMask.NameToLayer(TrafficIntersection.VehicleTagLayer), true);
     }
 }
