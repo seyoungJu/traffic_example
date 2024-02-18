@@ -20,16 +20,16 @@ public enum UnitType
 public class WheelDriveControl : MonoBehaviour
 {
     public float downForce = 100f;
-    public float maxAngle = 30f;
+    public float maxAngle = 60f;
     public float steeringLerp = 5f;
-    public float steeringSpeedMax = 20f;
-    public float maxTorque = 300f;
-    public float brakeTorque = 30000f;
+    public float steeringSpeedMax = 8f;
+    public float maxTorque = 100f;
+    public float brakeTorque = 100000f;
 
     public UnitType unitType;
 
-    public float minSpeed = 5f;
-    public float maxSpeed = 50f;
+    public float minSpeed = 2f;
+    public float maxSpeed = 10f;
 
     public GameObject leftWheelShape;
     public GameObject rightWheelShape;
@@ -41,18 +41,24 @@ public class WheelDriveControl : MonoBehaviour
     private float currentSteering = 0f;
     private Rigidbody rb;
 
-    private void OnAwake()
+    public void Init()
     {
         rb = GetComponent<Rigidbody>();
-    }
-
-    private void OnEnable()
-    {
         wheels = GetComponentsInChildren<WheelCollider>();
         foreach (var wheel in wheels)
         {
             wheel.ConfigureVehicleSubsteps(10, 1, 1);
         }
+    }
+
+    private void OnAwake()
+    {
+        Init();
+    }
+
+    private void OnEnable()
+    {
+        Init();
     }
 
     public float GetSpeedMS(float speed)
@@ -74,6 +80,11 @@ public class WheelDriveControl : MonoBehaviour
     {
         float nSteering = Mathf.Lerp(currentSteering, _steering, Time.deltaTime * steeringLerp);
         currentSteering = nSteering;
+
+        if(rb == null)
+        {
+            rb = GetComponent<Rigidbody>();
+        }
 
         float angle = maxAngle * nSteering;
         float torque = maxTorque * _acceleration;

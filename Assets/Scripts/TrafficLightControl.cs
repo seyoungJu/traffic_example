@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using TrafficSimulation;
 using UnityEngine;
 
 public class TrafficLightControl : MonoBehaviour
@@ -10,11 +9,23 @@ public class TrafficLightControl : MonoBehaviour
 
     private Light pointLight;
 
+    private float blink = 0f;
+
     void SetTrifficLightColor()
     {
-        if (lightGroupID == intersection.currentRedLightsGroup)
+        if (intersection.currentRedLightsGroup == lightGroupID)
         {
             pointLight.color = new Color(1, 0, 0);
+        }
+        else if(intersection.currentRedLightsGroup == 0)
+        {
+            blink = Mathf.Clamp01(blink + Time.deltaTime * 2f);
+
+            pointLight.color = new Color(blink, 0, 0);
+            if(blink >= 1f)
+            {
+                blink = 0f;
+            }
         }
         else
         {

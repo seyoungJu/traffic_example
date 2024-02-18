@@ -9,6 +9,7 @@ public enum IntersectionType
     STOP,
     TRAFFIC_LIGHT,
     TRAFFIC_SLOW,
+    EMERGENCY,
 }
 public class TrafficIntersection : MonoBehaviour
 {
@@ -18,6 +19,8 @@ public class TrafficIntersection : MonoBehaviour
     public List<TrafficSegment> prioritySegments;
 
     public float lightDuration = 8f;
+    private float lastChangeLightTime = 0f;
+    private Coroutine lightRoutine;
     public float lightRepeatRate = 8f;
     public float orangeLightDuration = 2;
     //red light segments?
@@ -43,11 +46,14 @@ public class TrafficIntersection : MonoBehaviour
                 }
             }
         }
-        else
+        else if (currentRedLightsGroup == 2)
         {
             foreach (var segment in lightsNBr2)
             {
-                return true;
+                if (segment.ID == vehicleSegment)
+                {
+                    return true;
+                }
             }
         }
 
@@ -74,8 +80,19 @@ public class TrafficIntersection : MonoBehaviour
 
     void SwitchLights()
     {
-        if (currentRedLightsGroup == 1) currentRedLightsGroup = 2;
-        else if (currentRedLightsGroup == 2) currentRedLightsGroup = 1;
+        if (currentRedLightsGroup == 1)
+        {
+            currentRedLightsGroup = 2;
+        }
+        else if (currentRedLightsGroup == 2)
+        {
+            currentRedLightsGroup = 1;
+        }
+        else
+        {
+            currentRedLightsGroup = 1;
+        }
+            
         
         Invoke("MoveVehiclesQueue", orangeLightDuration);
     }
@@ -84,10 +101,42 @@ public class TrafficIntersection : MonoBehaviour
     {
         vehiclesQueue = new List<GameObject>();
         vehiclesInIntersection = new List<GameObject>();
-        if (intersectionType == IntersectionType.TRAFFIC_LIGHT)
+        lastChangeLightTime = Time.time;
+        //if (intersectionType == IntersectionType.TRAFFIC_LIGHT)
+        //{
+            //InvokeRepeating("SwitchLights", lightDuration, lightRepeatRate);
+        //}
+    }
+
+    private void Update()
+    {
+        switch(intersectionType)
         {
-            InvokeRepeating("SwitchLights", lightDuration, lightRepeatRate);
+            case IntersectionType.EMERGENCY:
+                if(lightRoutine != null)
+                {
+                    StopCoroutine(lightRoutine);
+                    currentRedLightsGroup = 0;
+                }
+                break;
+            case IntersectionType.TRAFFIC_LIGHT:
+
+                if(Time.time > lastChangeLightTime + lightDuration)
+                {
+                    lastChangeLightTime = Time.time;
+                    lightRoutine = StartCoroutine("OnTrafficLight");
+                }                
+                break;
+
         }
+        
+        
+    }
+
+    private IEnumerator OnTrafficLight()
+    {        
+        SwitchLights();
+        yield return new WaitForSeconds(lightRepeatRate);
     }
 
     bool IsAlreadyInIntersection(GameObject target)
@@ -184,6 +233,20 @@ public class TrafficIntersection : MonoBehaviour
         vehicle.GetComponent<VehicleControl>().vehicleStatus = VehicleControl.Status.GO;
     }
 
+    void TriggerEmergency(GameObject vehicle)
+    {
+        VehicleControl vehicleControl = vehicle.GetComponent<VehicleControl>();
+        int vehicleSegment = vehicleControl.GetSegmentVehicleIsIn();
+
+        vehicleControl.vehicleStatus = VehicleControl.Status.STOP;
+        vehiclesQueue.Add(vehicle);
+
+    }
+    void ExitEmergency(GameObject vehicle)
+    {
+        vehicle.GetComponent<VehicleControl>().vehicleStatus = VehicleControl.Status.GO;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (IsAlreadyInIntersection(other.gameObject) || Time.timeSinceLevelLoad < .5f)
@@ -191,25 +254,42 @@ public class TrafficIntersection : MonoBehaviour
             return;
         }
 
-        if (other.tag == VehicleTagLayer && intersectionType == IntersectionType.STOP)
+        if(other.tag != VehicleTagLayer)
         {
-            TriggerStop(other.gameObject);
+            return;
         }
-        else if (other.tag == VehicleTagLayer && intersectionType == IntersectionType.TRAFFIC_LIGHT)
+        switch(intersectionType)
         {
-            TriggerLight(other.gameObject);
+            case IntersectionType.STOP:
+                TriggerStop(other.gameObject);
+                break;
+            case IntersectionType.TRAFFIC_LIGHT:
+                TriggerLight(other.gameObject);
+                break;
+            case IntersectionType.EMERGENCY:
+                TriggerEmergency(other.gameObject);
+                break;
         }
+
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.tag == VehicleTagLayer && intersectionType == IntersectionType.STOP)
+        if (other.tag != VehicleTagLayer)
         {
-            ExitStop(other.gameObject);
+            return;
         }
-        else if (other.tag == VehicleTagLayer && intersectionType == IntersectionType.TRAFFIC_LIGHT)
+        switch (intersectionType)
         {
-            ExitLight(other.gameObject);
+            case IntersectionType.STOP:
+                ExitStop(other.gameObject);
+                break;
+            case IntersectionType.TRAFFIC_LIGHT:
+                ExitLight(other.gameObject);
+                break;
+            case IntersectionType.EMERGENCY:
+                ExitEmergency(other.gameObject);
+                break;
         }
     }
 }

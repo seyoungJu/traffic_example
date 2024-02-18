@@ -223,7 +223,7 @@ public class TrafficHQEditor : Editor
 
         List<TrafficIntersection> intersectionList = new List<TrafficIntersection>();
         int itInter = 0;
-        foreach (Transform transInter in headQuater.transform.GetChild(0).transform)
+        foreach (Transform transInter in headQuater.transform.GetChild(1).transform)
         {
             TrafficIntersection intersection = transInter.GetComponent<TrafficIntersection>();
             if (intersection != null)

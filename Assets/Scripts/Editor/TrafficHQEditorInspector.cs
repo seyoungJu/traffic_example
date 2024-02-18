@@ -17,12 +17,12 @@ public static class TrafficHQEditorInspector
         InspectorHelper.Header("System Config");
         InspectorHelper.FloatField("Segment Detection Threshold", ref trafficHeadQuater.segDetectThresh);
         
-        InspectorHelper.PropertyField("Collision Layers", "conllisionLayers", serializedObject);
+        InspectorHelper.PropertyField("Collision Layers", "collisionLayers", serializedObject);
         
         EditorGUILayout.Space();
         
         InspectorHelper.HelpBox("Ctrl + Left Click to create a new segment\n Shift + Left Click to create a new waypoint. \n Alt + Left Click to create a new intersection");
-        InspectorHelper.Header("Reminder : The Vehicles will follow the point depending on the sequence you added them. (go to the 1st waypoint added, then to the second, etc..)");
+        InspectorHelper.HelpBox("Reminder : The Vehicles will follow the point depending on the sequence you added them. (go to the 1st waypoint added, then to the second, etc..)");
         
         EditorGUILayout.Space();
         restructureSystem = InspectorHelper.Button("Re-Structure Traffic System");

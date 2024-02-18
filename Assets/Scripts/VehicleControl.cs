@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TrafficSimulation;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -25,15 +24,15 @@ public class VehicleControl : MonoBehaviour
         SLOW_DOWN
     }
     public TrafficHeadQuater trafficHeadQuater;
-    public float waypointThresh = 6f;
+    public float waypointThresh = 2.5f;
 
     public Transform raycastAnchor;
-    public float raycastLength = 5f;
-    public int raySpacing = 2;
-    public int raysNumber = 6;
+    public float raycastLength = 3f;
+    public int raySpacing = 3;
+    public int raysNumber = 8;
     
-    public float emergencyBrakeThresh = 2f;
-    public float slowDownThresh = 4f;
+    public float emergencyBrakeThresh = 1.5f;
+    public float slowDownThresh = 5f;
 
     [HideInInspector] public Status vehicleStatus = Status.GO;
 
@@ -50,6 +49,11 @@ public class VehicleControl : MonoBehaviour
         wheelDriveControl = GetComponent<WheelDriveControl>();
         initMaxSpeed = wheelDriveControl.maxSpeed;
         //1
+        if(raycastAnchor == null && transform.Find("Raycast Anchor") != null)
+        {
+            raycastAnchor = transform.Find("Raycast Anchor");
+        }
+        
         SetWaypointVehicleIsOn();
     }
 

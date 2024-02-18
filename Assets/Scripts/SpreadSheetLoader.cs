@@ -13,20 +13,29 @@ public class SpreadSheetLoader : MonoBehaviour
     public readonly string ADDRESS =
         "https://docs.google.com/spreadsheets/d/1aNOsNnagk81TsVBMBiK3n3BKQPhTENnhPqQx1JPFKSM";
 
-    public readonly string RANGE = "A2:B17";
+    public readonly string RANGE = "A2:B10";
     public readonly long SHEET_ID = 0;
+    private string loadString = string.Empty;
 
-    private IEnumerator LoadData()
+    private IEnumerator LoadData(System.Action<string> onMessageReceived)
     {
         UnityWebRequest www = UnityWebRequest.Get(GetTSVAddress(ADDRESS, RANGE, SHEET_ID));
         yield return www.SendWebRequest();
-        
+
         Debug.Log(www.downloadHandler.text);
+
+        if(onMessageReceived != null)
+        {
+            onMessageReceived(www.downloadHandler.text);
+        }
+        yield return null;
     }
-    
-    private void Start()
+
+    public string StartLoader()
     {
-        StartCoroutine(LoadData());
+        StartCoroutine(LoadData(output => loadString = output));
+
+        return loadString;
     }
 
 }
