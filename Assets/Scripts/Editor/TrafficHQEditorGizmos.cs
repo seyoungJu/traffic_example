@@ -31,9 +31,11 @@ public static class TrafficHQEditorGizmos
                 throw new ArgumentOutOfRangeException();
         }
     }
+    //Custom Gizmo function
     [DrawGizmo(GizmoType.Selected | GizmoType.NonSelected | GizmoType.Active)]
     private static void DrawGizmo(TrafficHeadQuater headQuater, GizmoType gizmoType)
     {
+        //기즈모 안그린다면 그냥 리턴.
         if (headQuater.hideGizmos)
         {
             return;
@@ -41,16 +43,18 @@ public static class TrafficHQEditorGizmos
 
         foreach (TrafficSegment segment in headQuater.segments)
         {
+            //세그먼트 이름 출력.
             GUIStyle style = new GUIStyle {normal = {textColor = new Color(1,0,0)}, fontSize = 15};
             Handles.Label(segment.transform.position, segment.name, style);
-
+            //웨이포인트 그리기.
             for (int j = 0; j < segment.waypoints.Count; j++)
             {
+                //현재 웨이포인트 위치 찾아서.
                 Vector3 pos = segment.waypoints[j].GetVisualPos();
-
+                //구 그리고, 방향을 표시하려면 색상을 변경.
                 Gizmos.color = new Color(0, 0, 0, (j + 1) / (float)segment.waypoints.Count);
                 Gizmos.DrawSphere(pos, headQuater.wayPointSize);
-                
+                //다음 웨이포인트 위치 얻기.
                 Vector3 pNext = Vector3.zero;
 
                 if (j < segment.waypoints.Count - 1 && segment.waypoints[j + 1] != null)
@@ -69,11 +73,11 @@ public static class TrafficHQEditorGizmos
                     {
                         Gizmos.color = new Color(1f, 0f, 0f);
                     }
-                    
+                    //두 웨이포인트의 연결선 그리기.
                     Gizmos.DrawLine(pos, pNext);
-
+                    //arrowDrawType을 기반으로 화살표 수 설정.
                     int arrows = GetArrowCount(pos, pNext, headQuater);
-
+                    //Draw arrows
                     for (int i = 1; i < arrows + 1; i++)
                     {
                         Vector3 point = Vector3.Lerp(pos, pNext, (float)i / (arrows + 1));
@@ -81,7 +85,7 @@ public static class TrafficHQEditorGizmos
                     }
                 }
             }
-
+            //세그먼트를 연결하는 선 그리기.
             foreach (TrafficSegment nextSegment in segment.nextSegments)
             {
                 if (nextSegment != null)

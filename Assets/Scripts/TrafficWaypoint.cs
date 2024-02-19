@@ -20,20 +20,14 @@ public class TrafficWaypoint : MonoBehaviour
         this.segment = newSegment;
         name = "Waypoint-" + newID.ToString();
         tag = "Waypoint";
-
+        //Set the layer to Default
         gameObject.layer = LayerMask.NameToLayer("Default");
-        
+        //Remove the Collider cause it it not necessary any more
         RemoveCollider();
         
     }
-
-
     public Vector3 GetVisualPos()
     {
         return transform.position + new Vector3(0, 0.5f, 0f);
     }
-    
-    
-    
-
 }

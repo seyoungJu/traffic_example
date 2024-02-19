@@ -36,11 +36,12 @@ public class VehicleControlEditor : Editor
         EditorHelper.SetUndoGroup("Setup Vehicle");
 
         GameObject selected = Selection.activeGameObject;
-
+        //레이캐스트 앵커 만들고.
         GameObject anchor = EditorHelper.CreateGameObject("RayCast Anchor", selected.transform);
+        
         anchor.transform.localPosition = Vector3.zero;
         anchor.transform.localRotation = quaternion.identity;
-
+        //자동차 조종 스크립트를 설정.
         VehicleControl vehicleControl = EditorHelper.AddComponent<VehicleControl>(selected);
         vehicleControl.raycastAnchor = anchor.transform;
 
@@ -92,9 +93,9 @@ public class VehicleControlEditor : Editor
         BoxCollider bodyCollider = EditorHelper.AddComponent<BoxCollider>(Body);
         bodyCollider.center = new Vector3(0f, 0.4f, 0f);
         bodyCollider.size = new Vector3(0.95f, 0.54f, 2.0f);
-
+        //Create layer AutonomousVehicle if it doesn't exist
         EditorHelper.CreateLayer(TrafficIntersection.VehicleTagLayer);
-
+        //Set the tag and layer name
         selected.tag = TrafficIntersection.VehicleTagLayer;
         EditorHelper.SetLayer(selected, LayerMask.NameToLayer(TrafficIntersection.VehicleTagLayer), true);
 

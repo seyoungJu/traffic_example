@@ -8,12 +8,15 @@ public static class EditorHelper
 {
     public static void SetUndoGroup(string label)
     {
+        //Create new Undo Group to collect all changes in one Undo
         Undo.SetCurrentGroupName(label);
     }
 
     public static void BeginUndoGroup(string undoName, TrafficHeadQuater trafficHeadQuater)
     {
+        //Create new Undo Group to collect all changes in one Undo
         Undo.SetCurrentGroupName(undoName);
+        //Register all TrafficSystem changes after this (string not relevant here)
         Undo.RegisterFullObjectHierarchyUndo(trafficHeadQuater.gameObject, undoName);
     }
 
@@ -23,7 +26,7 @@ public static class EditorHelper
         newGameObject.transform.position = Vector3.zero;
         newGameObject.transform.localScale = Vector3.one;
         newGameObject.transform.localRotation = Quaternion.identity;
-
+        
         Undo.RegisterFullObjectHierarchyUndo(newGameObject, "Spawn new GameObject");
         Undo.SetTransformParent(newGameObject.transform, parent, "Set parent");
 
@@ -86,6 +89,7 @@ public static class EditorHelper
             if (firstEmptyProp == null)
             {
                 firstEmptyProp = layerProp;
+                break;
             }
         }
 

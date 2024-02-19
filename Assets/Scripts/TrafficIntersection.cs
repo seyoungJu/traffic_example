@@ -15,15 +15,15 @@ public class TrafficIntersection : MonoBehaviour
 {
     public IntersectionType intersectionType = IntersectionType.NONE;
     public int ID;
-
+    //우선 멈춤 구간들.
     public List<TrafficSegment> prioritySegments;
-
+    //신호등 구간.
     public float lightDuration = 8f;
     private float lastChangeLightTime = 0f;
     private Coroutine lightRoutine;
     public float lightRepeatRate = 8f;
     public float orangeLightDuration = 2;
-    //red light segments?
+    //빨간 불 구간.
     public List<TrafficSegment> lightsNBr1;
     public List<TrafficSegment> lightsNBr2;
 
@@ -62,6 +62,7 @@ public class TrafficIntersection : MonoBehaviour
 
     void MoveVehiclesQueue()
     {
+        //큐에 있는 모든 자동차를 이동시킴.
         List<GameObject> nVehicleQueue = new List<GameObject>(vehiclesQueue);
         foreach (var vehicle in vehiclesQueue)
         {
@@ -93,7 +94,7 @@ public class TrafficIntersection : MonoBehaviour
             currentRedLightsGroup = 1;
         }
             
-        
+        //다른 차량을 움직이게 하기 전에 조명 전환 후 몇 초 동안 기다리십시오(= 주황색 조명).
         Invoke("MoveVehiclesQueue", orangeLightDuration);
     }
     
@@ -102,10 +103,6 @@ public class TrafficIntersection : MonoBehaviour
         vehiclesQueue = new List<GameObject>();
         vehiclesInIntersection = new List<GameObject>();
         lastChangeLightTime = Time.time;
-        //if (intersectionType == IntersectionType.TRAFFIC_LIGHT)
-        //{
-            //InvokeRepeating("SwitchLights", lightDuration, lightRepeatRate);
-        //}
     }
 
     private void Update()
@@ -176,7 +173,7 @@ public class TrafficIntersection : MonoBehaviour
     void TriggerStop(GameObject vehicle)
     {
         VehicleControl vehicleControl = vehicle.GetComponent<VehicleControl>();
-
+        //웨이포인트 임계값에 따라 자동차는 대상 구간 또는 지난 구간에 있을 수 있습니다.
         int vehicleSegment = vehicleControl.GetSegmentVehicleIsIn();
 
         if (IsPrioritySegment(vehicleSegment) == false)
@@ -249,6 +246,8 @@ public class TrafficIntersection : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        //차량이 이미 목록에 있는지 확인하고, 그렇다면 중단.
+        //방금 장면을 시작한 경우에도 중단합니다(시작 시 충돌체 내부의 차량이 있는 경우).
         if (IsAlreadyInIntersection(other.gameObject) || Time.timeSinceLevelLoad < .5f)
         {
             return;
